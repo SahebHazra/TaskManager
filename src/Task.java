@@ -28,12 +28,20 @@ public class Task {
 
     // mark as completed
     public void markCompleted() {
+        if (isCompleted)
+            return;
         this.isCompleted = true;
     }
 
     // Trun into opposite
     public void changeStatus() {
         this.isCompleted = (isCompleted) ? false : true;
+    }
+
+    @Override
+    public String toString() {
+        String status = (isCompleted) ? "Done" : "Pending";
+        return "[ " + ID + " ] " + title + " - " + status;
     }
 
 }
