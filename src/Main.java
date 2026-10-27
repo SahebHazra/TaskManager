@@ -18,52 +18,67 @@ public class Main {
     static boolean isEnd = false;
 
     public static void main(String[] args) {
+
+        TaskService taskService = null;
         try {
-            TaskService taskService = new TaskService(new TaskStorage());
-            while (!isEnd) {
+            taskService = new TaskService(new TaskStorage());
+        } catch (IOException e) {
+            System.out.println("Failed to read data");
+        }
+
+        while (!isEnd) {
+            try {
                 Menu.taskMenu();
                 runMenu(taskService);
                 System.out.println();
+            } catch (IOException e) {
+                System.err.println("err: " + e);
+                System.out.println("Failed to write data\n");
+            } catch (IllegalArgumentException e) {
+                System.err.println("err: " + e + "\n");
             }
-        } catch (IOException e) {
-            System.err.println("err: " + e);
-            // break;
         }
     }
 
     private static String takeInput(String message) {
         System.out.print(message);
-        return sc.nextLine();
-
+        var input = sc.nextLine();
+        if (input == null || input.isBlank() || input.isEmpty()) {
+            throw new IllegalArgumentException("Not a valid Input");
+        }
+        return input;
     }
 
     private static void printList(List<Task> records) {
         records.forEach(record -> System.out.println(record));
     }
 
-    public static void runMenu(TaskService taskService) throws IOException {
+    private static void runMenu(TaskService taskService) throws IOException, IllegalArgumentException {
 
         var option = takeInput("\nChoose : ").trim();
         switch (option) {
-            case "1" -> taskService.addTask(takeInput("Title : "));
-
+            case "1" -> {
+                try {
+                    taskService.addTask(takeInput("Title : "));
+                } catch (IllegalArgumentException e) {
+                    System.err.println("err: " + e);
+                }
+            }
             case "2" -> printList(taskService.getAllTaskRecords());
-
-            case "3" -> taskService.markAsCompleteFor(Integer.parseInt(takeInput("Enter ID: ")));
+            case "3" -> taskService.markAsCompleteFor(Integer.parseInt(takeInput("Enter ID: ").trim()));
 
             case "4" -> {
                 System.out.println("1: Completd Task");
                 System.out.println("2: Pending Task");
 
-                String choise = takeInput("Choose : ");
+                String choise = takeInput("Chose : ").trim();
                 switch (choise) {
                     case "1" -> printList(taskService.getTasksByStatus(true));
                     case "2" -> printList(taskService.getTasksByStatus(false));
                     default -> System.out.println("Invalid Input");
                 }
             }
-            case "5" -> taskService.deleteTask(Integer.parseInt(takeInput("Enter ID: ")));
-
+            case "5" -> taskService.deleteTask(Integer.parseInt(takeInput("Enter ID: ").trim()));
             case "6" -> {
                 isEnd = true;
                 System.out.println("See you next Time");
