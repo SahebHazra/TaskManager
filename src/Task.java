@@ -5,8 +5,6 @@ public class Task {
 
     public Task(int id, String title) {
         this.ID = id;
-        if (title.equalsIgnoreCase("null") || title.isBlank() || title.isEmpty())
-            title = "Default Title";
         this.title = title;
         isCompleted = false;
     }

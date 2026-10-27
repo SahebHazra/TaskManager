@@ -1,109 +1,76 @@
-import java.util.HashMap;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TaskService {
 
-    private static int ID;
-
-    private static HashMap<Integer, Task> taskMap;
+    private static int ID = 1;
+    private static List<Task> taskList;
     TaskStorage taskStorage;
 
-    public TaskService(TaskStorage taskStorage) {
+    public TaskService(TaskStorage taskStorage) throws IOException {
         this.taskStorage = taskStorage;
-        taskMap = new HashMap<>(taskStorage.getPreviousRecords());
+        taskList = new ArrayList<>(taskStorage.getPreviousRecords());
         ID = taskStorage.getLastId() + 1;
     }
 
-    public void addTask(String title) {
-        int key = ID;
-        taskMap.put(key, new Task(ID++, title));
-        if (taskMap.containsKey(key)) {
-            taskStorage.storeCurrentData(key, title, taskMap.get(key).isCompleted());
-            System.out.println("Task Added!");
-        } else
-            System.out.println("Failed to Add!");
-    }
-
-    public void showAllTask() {
-        if (taskMap.isEmpty()) {
-            System.out.println("No Records Found");
-            return;
+    public void addTask(String title) throws IOException {
+        if (title == null || title.isBlank()) {
+            throw new IllegalArgumentException("Task title cannot be empty.");
         }
-        for (Task task : taskMap.values()) {
-            System.out.println(task);
+        Task task = new Task(ID++, title);
+        taskList.add(task);
+        taskStorage.storeCurrentData(task);
+        System.out.println("Task Added!");
+    }
+
+    public ArrayList<Task> getAllTaskRecords() {
+        return new ArrayList<>(taskList);
+    }
+
+    public void markAsCompleteFor(int id) throws IOException {
+        if (changeTaskStatus(id, "complete")) {
+            System.out.println("Status has change");
+        } else {
+            System.out.println("Failed to change status");
         }
     }
 
-    public String getStatusFor(int id) {
-        if (taskMap.isEmpty())
-            return "NO RECORD FOUND!";
-        if (taskMap.containsKey(id))
-            return taskMap.get(id).isCompleted() ? "Done" : "Pending";
-        return "ID not match!";
-    }
-
-    public void markAsCompleteFor(int id) {
-        changeStausFor(id, "complete");
-    }
-
-    public void changeStausFor(int id) {
-        changeStausFor(id, "change");
-    }
-
-    private void changeStausFor(int id, String completeOrChange) {
-        if (taskMap.isEmpty())
-            System.out.println("NO RECORD FOUND!");
-        if (taskMap.containsKey(id)) {
-            Task task = taskMap.get(id);
-            boolean oldMark = task.isCompleted();
-            if (completeOrChange.equalsIgnoreCase("change"))
-                task.changeStatus();
-            else
-                task.markCompleted();
-            if (task.isCompleted() != oldMark) {
-                System.out.println("Status is Changed : ");
-                System.out.println(task);
-                taskStorage.updateRecordsAccodingToMap(taskMap);
-            } else {
-                System.out.println("Before and After both Status are same");
-            }
-        } else
-            System.out.println("ID not match!");
-    }
-
-    public void filterTasksFor(int choice) {
-        boolean isAnyMatch = false;
-        if (choice < 1 || choice > 2) {
-            System.out.println("Invalid Choice");
-            return;
+    public void changeStausFor(int id) throws IOException {
+        if (changeTaskStatus(id, "change")) {
+            System.out.println("Status has change");
+        } else {
+            System.out.println("Failed to change status");
         }
-        boolean isCompleted = (choice == 1) ? false : true;
-        for (Task task : taskMap.values()) {
-            if ((isCompleted) && (task.isCompleted())) {
-                isAnyMatch = true;
-                System.out.println(task);
-            } else if (!isCompleted && !task.isCompleted()) {
-                isAnyMatch = true;
-                System.out.println(task);
+    }
+
+    private boolean changeTaskStatus(int id, String type) throws IOException {
+        for (Task task : taskList) {
+            if (task.getID() == id) {
+                var oldMark = task.isCompleted();
+                if (type.equalsIgnoreCase("complete"))
+                    task.markCompleted();
+                else
+                    task.changeStatus();
+                if (oldMark != task.isCompleted()) {
+                    taskStorage.updateAllRecords(taskList);
+                }
+                return true;
             }
         }
-        if (!isAnyMatch) {
-            System.out.println("No Record found for that Status");
-        }
+        return false;
     }
 
-    public void deleteRecordFor(int id) {
-        if (taskMap.isEmpty())
-            System.out.println("NO RECORD FOUND!");
-        if (taskMap.containsKey(id)) {
-            taskMap.remove(id);
-            if (!taskMap.containsKey(id)) {
-                System.out.println("Deleted Sucessfully!");
-                taskStorage.updateRecordsAccodingToMap(taskMap);
-            } else {
-                System.out.println("Failed to Delete!");
-            }
-        } else
-            System.out.println("ID not match!");
+    public List<Task> getTasksByStatus(boolean completed) {
+        return taskList.stream()
+                .filter(task -> task.isCompleted() == completed)
+                .toList();
     }
 
+    public boolean deleteTask(int id) throws IOException {
+        boolean removed = taskList.removeIf(task -> task.getID() == id);
+        if (removed)
+            taskStorage.updateAllRecords(taskList);
+        return removed;
+    }
 }

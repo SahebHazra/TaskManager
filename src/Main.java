@@ -1,3 +1,5 @@
+import java.io.IOException;
+import java.util.List;
 import java.util.Scanner;
 
 class Menu {
@@ -12,50 +14,57 @@ class Menu {
 }
 
 public class Main {
-    static Scanner sc;
+    final static Scanner sc = new Scanner(System.in);
     static boolean isEnd = false;
 
     public static void main(String[] args) {
-        TaskService taskService = new TaskService(new TaskStorage());
-        sc = new Scanner(System.in);
-        while (!isEnd) {
-            try {
+        try {
+            TaskService taskService = new TaskService(new TaskStorage());
+            while (!isEnd) {
                 Menu.taskMenu();
-                System.out.print("\nChoose : ");
-                int option = Integer.parseInt(sc.nextLine());
-                runMenu(taskService, option, sc);
+                runMenu(taskService);
                 System.out.println();
-            } catch (Exception e) {
-                System.err.println("err: " + e);
-                // break;
             }
+        } catch (IOException e) {
+            System.err.println("err: " + e);
+            // break;
         }
     }
 
-    public static void runMenu(TaskService taskService, int option, Scanner scanner) {
-        sc = scanner;
-        switch (option) {
-            case 1 -> {
-                System.out.print("Title : ");
-                taskService.addTask(sc.nextLine());
-            }
-            case 2 -> taskService.showAllTask();
+    private static String takeInput(String message) {
+        System.out.print(message);
+        return sc.nextLine();
 
-            case 3 -> {
-                System.out.print("Enter ID: ");
-                taskService.markAsCompleteFor(Integer.parseInt(sc.nextLine()));
+    }
+
+    private static void printList(List<Task> records) {
+        records.forEach(record -> System.out.println(record));
+    }
+
+    public static void runMenu(TaskService taskService) throws IOException {
+
+        var option = takeInput("\nChoose : ").trim();
+        switch (option) {
+            case "1" -> taskService.addTask(takeInput("Title : "));
+
+            case "2" -> printList(taskService.getAllTaskRecords());
+
+            case "3" -> taskService.markAsCompleteFor(Integer.parseInt(takeInput("Enter ID: ")));
+
+            case "4" -> {
+                System.out.println("1: Completd Task");
+                System.out.println("2: Pending Task");
+
+                String choise = takeInput("Choose : ");
+                switch (choise) {
+                    case "1" -> printList(taskService.getTasksByStatus(true));
+                    case "2" -> printList(taskService.getTasksByStatus(false));
+                    default -> System.out.println("Invalid Input");
+                }
             }
-            case 4 -> {
-                System.out.println("1: Pending Task");
-                System.out.println("2: Completd Task");
-                System.out.print("Choose :  ");
-                taskService.filterTasksFor(Integer.parseInt(sc.nextLine()));
-            }
-            case 5 -> {
-                System.out.print("Enter ID: ");
-                taskService.deleteRecordFor(Integer.parseInt(sc.nextLine()));
-            }
-            case 6 -> {
+            case "5" -> taskService.deleteTask(Integer.parseInt(takeInput("Enter ID: ")));
+
+            case "6" -> {
                 isEnd = true;
                 System.out.println("See you next Time");
             }
