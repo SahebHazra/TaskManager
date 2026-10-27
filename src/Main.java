@@ -4,8 +4,8 @@ class Menu {
     public static void taskMenu() {
         System.out.println("1: Add Task");
         System.out.println("2: Show All Task");
-        System.out.println("3: Know Status of Task By ID");
-        System.out.println("4: Change Status of Task by ID");
+        System.out.println("3: Mark task as Completed");
+        System.out.println("4: Filter Tasks by Status");
         System.out.println("5: Delete record by Task ID");
         System.out.println("6: Exit");
     }
@@ -43,11 +43,13 @@ public class Main {
 
             case 3 -> {
                 System.out.print("Enter ID: ");
-                System.out.println(" Status : " + taskService.getStatusFor(Integer.parseInt(sc.nextLine())));
+                taskService.markAsCompleteFor(Integer.parseInt(sc.nextLine()));
             }
             case 4 -> {
-                System.out.print("Enter ID: ");
-                taskService.changeStausFor(Integer.parseInt(sc.nextLine()));
+                System.out.println("1: Pending Task");
+                System.out.println("2: Completd Task");
+                System.out.print("Choose :  ");
+                taskService.filterTasksFor(Integer.parseInt(sc.nextLine()));
             }
             case 5 -> {
                 System.out.print("Enter ID: ");

@@ -42,7 +42,7 @@ public class Task {
 
     @Override
     public String toString() {
-        String status = (isCompleted) ? "Done" : "Pending";
+        String status = (isCompleted) ? "DONE" : "PENDING";
         return "[ " + ID + " ] " + title + " - " + status;
     }
 

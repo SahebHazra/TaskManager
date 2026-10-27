@@ -4,42 +4,40 @@ public class TaskService {
 
     private static int ID;
 
-    private static HashMap<Integer, Task> taskList;
-    Task task;
+    private static HashMap<Integer, Task> taskMap;
     TaskStorage taskStorage;
 
     public TaskService(TaskStorage taskStorage) {
         this.taskStorage = taskStorage;
-        taskList = new HashMap<>(taskStorage.getPreviousRecords());
+        taskMap = new HashMap<>(taskStorage.getPreviousRecords());
         ID = taskStorage.getLastId() + 1;
     }
 
     public void addTask(String title) {
         int key = ID;
-        task = new Task(ID++, title);
-        taskList.put(key, task);
-        if (taskList.containsKey(key)) {
-            taskStorage.storeCurrentData(key, title, taskList.get(key).isCompleted());
+        taskMap.put(key, new Task(ID++, title));
+        if (taskMap.containsKey(key)) {
+            taskStorage.storeCurrentData(key, title, taskMap.get(key).isCompleted());
             System.out.println("Task Added!");
         } else
             System.out.println("Failed to Add!");
     }
 
     public void showAllTask() {
-        if (taskList.isEmpty()) {
+        if (taskMap.isEmpty()) {
             System.out.println("No Records Found");
             return;
         }
-        for (Task task : taskList.values()) {
+        for (Task task : taskMap.values()) {
             System.out.println(task);
         }
     }
 
     public String getStatusFor(int id) {
-        if (taskList.isEmpty())
+        if (taskMap.isEmpty())
             return "NO RECORD FOUND!";
-        if (taskList.containsKey(id))
-            return taskList.get(id).isCompleted() ? "Done" : "Pending";
+        if (taskMap.containsKey(id))
+            return taskMap.get(id).isCompleted() ? "Done" : "Pending";
         return "ID not match!";
     }
 
@@ -52,34 +50,55 @@ public class TaskService {
     }
 
     private void changeStausFor(int id, String completeOrChange) {
-        if (taskList.isEmpty())
+        if (taskMap.isEmpty())
             System.out.println("NO RECORD FOUND!");
-        if (taskList.containsKey(id)) {
-            Task task = taskList.get(id);
+        if (taskMap.containsKey(id)) {
+            Task task = taskMap.get(id);
             boolean oldMark = task.isCompleted();
             if (completeOrChange.equalsIgnoreCase("change"))
                 task.changeStatus();
             else
-                 task.markCompleted();
+                task.markCompleted();
             if (task.isCompleted() != oldMark) {
                 System.out.println("Status is Changed : ");
                 System.out.println(task);
-                taskStorage.updateRecordsAccodingToMap(taskList);
-            }else{
-                System.out.println("Failed to change the status!");
+                taskStorage.updateRecordsAccodingToMap(taskMap);
+            } else {
+                System.out.println("Before and After both Status are same");
             }
         } else
             System.out.println("ID not match!");
     }
 
+    public void filterTasksFor(int choice) {
+        boolean isAnyMatch = false;
+        if (choice < 1 || choice > 2) {
+            System.out.println("Invalid Choice");
+            return;
+        }
+        boolean isCompleted = (choice == 1) ? false : true;
+        for (Task task : taskMap.values()) {
+            if ((isCompleted) && (task.isCompleted())) {
+                isAnyMatch = true;
+                System.out.println(task);
+            } else if (!isCompleted && !task.isCompleted()) {
+                isAnyMatch = true;
+                System.out.println(task);
+            }
+        }
+        if (!isAnyMatch) {
+            System.out.println("No Record found for that Status");
+        }
+    }
+
     public void deleteRecordFor(int id) {
-        if (taskList.isEmpty())
+        if (taskMap.isEmpty())
             System.out.println("NO RECORD FOUND!");
-        if (taskList.containsKey(id)) {
-            taskList.remove(id);
-            if (!taskList.containsKey(id)) {
+        if (taskMap.containsKey(id)) {
+            taskMap.remove(id);
+            if (!taskMap.containsKey(id)) {
                 System.out.println("Deleted Sucessfully!");
-                taskStorage.updateRecordsAccodingToMap(taskList);
+                taskStorage.updateRecordsAccodingToMap(taskMap);
             } else {
                 System.out.println("Failed to Delete!");
             }
