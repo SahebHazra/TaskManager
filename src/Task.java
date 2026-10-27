@@ -28,14 +28,10 @@ public class Task {
         return isCompleted;
     }
 
-    // mark as completed
     public void markCompleted() {
-        if (isCompleted)
-            return;
         this.isCompleted = true;
     }
 
-    // Trun into opposite
     public void changeStatus() {
         this.isCompleted = (isCompleted) ? false : true;
     }
