@@ -4,6 +4,7 @@ import java.util.Scanner;
 
 class Menu {
     public static void taskMenu() {
+        System.out.println("===== Task Manager =====");
         System.out.println("1: Add Task");
         System.out.println("2: Show All Tasks");
         System.out.println("3: Mark Task as Completed");

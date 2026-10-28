@@ -31,6 +31,7 @@ public class TaskStorage {
     public List<Task> getPreviousRecords() throws IOException {
         List<Task> tasks = new ArrayList<>();
         File file = createFileIfMissing(PATH_DIR + "/" + RECORD_FILE);
+        boolean needToRewriteTheRecord = false;
 
         try (Scanner scanner = new Scanner(file)) {
             int lineNumber = 0;
@@ -43,9 +44,18 @@ public class TaskStorage {
 
                 // Keep the remainder of the line as the title, including spaces between words.
                 String[] parts = line.split("\\s+", 3);
-                if (parts.length != 3
-                        || !parts[1].equalsIgnoreCase("true") && !parts[1].equalsIgnoreCase("false")) {
-                    throw new IOException("Invalid task record at line " + lineNumber + ".");
+                if (parts.length != 3 || !parts[1].equalsIgnoreCase("true") && !parts[1].equalsIgnoreCase("false")) {
+                    // throw new IOException("Invalid task record at line " + lineNumber + ".");
+                    System.out.println("\nInvalid task record at line " + lineNumber + ".");
+                    if (parts.length == 3) {
+                        System.out.println("set to auto fix\n");
+                        parts[1] = "false";
+                        needToRewriteTheRecord = true;
+                    } else {
+                        System.out.println("Skipping that line\n");
+                        needToRewriteTheRecord = true;
+                        continue;
+                    }
                 }
 
                 try {
@@ -53,14 +63,24 @@ public class TaskStorage {
                     boolean completed = Boolean.parseBoolean(parts[1]);
                     String title = parts[2];
                     if (title.isBlank()) {
-                        throw new IOException("Task title is empty at line " + lineNumber + ".");
+                        // throw new IOException("Task title is empty at line " + lineNumber + ".");
+                        System.out.println("Task title is empty at line " + lineNumber + ".");
+                        System.out.println("Skipping that line\n");
+                        needToRewriteTheRecord = true;
+                        continue;
                     }
                     tasks.add(new Task(id, title, completed));
                 } catch (NumberFormatException e) {
-                    throw new IOException("Invalid task ID at line " + lineNumber + ".", e);
+                    // throw new IOException("Invalid task ID at line " + lineNumber + ".", e);
+                    System.out.println("Invalid task ID at line " + lineNumber + ". " + e.getMessage());
+                    System.out.println("Skipping that line\n");
+                    needToRewriteTheRecord = true;
+                    continue;
                 }
             }
         }
+        if (needToRewriteTheRecord)
+            updateAllRecords(tasks);
         return tasks;
     }
 
@@ -92,17 +112,13 @@ public class TaskStorage {
     public void updateAllRecords(List<Task> records) throws IOException {
         File file = createFileIfMissing(PATH_DIR + "/" + RECORD_FILE);
         try (FileWriter writer = new FileWriter(file, false)) {
+            int highestId = getLastId();
             for (Task task : records) {
                 writer.write(task.getID() + " " + task.isCompleted() + " " + task.getTitle()
                         + System.lineSeparator());
+                highestId = Math.max(highestId, task.getID());
             }
+            storeLastId(highestId);
         }
-
-        // Keep IDs increasing even after the highest-numbered task is deleted.
-        int highestId = getLastId();
-        for (Task task : records) {
-            highestId = Math.max(highestId, task.getID());
-        }
-        storeLastId(highestId);
     }
 }
