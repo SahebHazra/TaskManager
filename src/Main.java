@@ -5,25 +5,25 @@ import java.util.Scanner;
 class Menu {
     public static void taskMenu() {
         System.out.println("1: Add Task");
-        System.out.println("2: Show All Task");
-        System.out.println("3: Mark task as Completed");
+        System.out.println("2: Show All Tasks");
+        System.out.println("3: Mark Task as Completed");
         System.out.println("4: Filter Tasks by Status");
-        System.out.println("5: Delete record by Task ID");
+        System.out.println("5: Delete Task by ID");
         System.out.println("6: Exit");
     }
 }
 
 public class Main {
-    final static Scanner sc = new Scanner(System.in);
-    static boolean isEnd = false;
+    private static final Scanner sc = new Scanner(System.in);
+    private static boolean isEnd = false;
 
     public static void main(String[] args) {
-
-        TaskService taskService = null;
+        final TaskService taskService;
         try {
             taskService = new TaskService(new TaskStorage());
         } catch (IOException e) {
-            System.out.println("Failed to read data");
+            System.err.println("Could not initialise task storage: " + e.getMessage());
+            return;
         }
 
         while (!isEnd) {
@@ -32,58 +32,68 @@ public class Main {
                 runMenu(taskService);
                 System.out.println();
             } catch (IOException e) {
-                System.err.println("err: " + e);
-                System.out.println("Failed to write data\n");
+                System.err.println("Could not save task data: " + e.getMessage());
             } catch (IllegalArgumentException e) {
-                System.err.println("err: " + e + "\n");
+                System.err.println("Invalid input: " + e.getMessage());
             }
         }
     }
 
     private static String takeInput(String message) {
         System.out.print(message);
-        var input = sc.nextLine();
-        if (input == null || input.isBlank() || input.isEmpty()) {
-            throw new IllegalArgumentException("Not a valid Input");
+        String input = sc.nextLine();
+        if (input.isBlank()) {
+            throw new IllegalArgumentException("Input cannot be empty.");
         }
         return input;
     }
 
     private static void printList(List<Task> records) {
-        records.forEach(record -> System.out.println(record));
+        if (records.isEmpty()) {
+            System.out.println("No tasks found.");
+            return;
+        }
+        records.forEach(System.out::println);
     }
 
-    private static void runMenu(TaskService taskService) throws IOException, IllegalArgumentException {
-
-        var option = takeInput("\nChoose : ").trim();
+    private static void runMenu(TaskService taskService) throws IOException {
+        String option = takeInput("\nChoose: ").trim();
         switch (option) {
             case "1" -> {
                 try {
-                    taskService.addTask(takeInput("Title : "));
+                    taskService.addTask(takeInput("Title: ").trim());
                 } catch (IllegalArgumentException e) {
-                    System.err.println("err: " + e);
+                    System.err.println("Invalid task: " + e.getMessage());
                 }
             }
             case "2" -> printList(taskService.getAllTaskRecords());
-            case "3" -> taskService.markAsCompleteFor(Integer.parseInt(takeInput("Enter ID: ").trim()));
-
+            case "3" -> {
+                int id = Integer.parseInt(takeInput("Enter task ID: ").trim());
+                System.out.println(taskService.markAsCompleteFor(id)
+                        ? "Task marked as completed."
+                        : "No task found with ID " + id + ".");
+            }
             case "4" -> {
-                System.out.println("1: Completd Task");
-                System.out.println("2: Pending Task");
-
-                String choise = takeInput("Chose : ").trim();
-                switch (choise) {
+                System.out.println("1: Completed Tasks");
+                System.out.println("2: Pending Tasks");
+                String choice = takeInput("Choose: ").trim();
+                switch (choice) {
                     case "1" -> printList(taskService.getTasksByStatus(true));
                     case "2" -> printList(taskService.getTasksByStatus(false));
-                    default -> System.out.println("Invalid Input");
+                    default -> System.out.println("Invalid choice. Enter 1 or 2.");
                 }
             }
-            case "5" -> taskService.deleteTask(Integer.parseInt(takeInput("Enter ID: ").trim()));
+            case "5" -> {
+                int id = Integer.parseInt(takeInput("Enter task ID: ").trim());
+                System.out.println(taskService.deleteTask(id)
+                        ? "Task deleted."
+                        : "No task found with ID " + id + ".");
+            }
             case "6" -> {
                 isEnd = true;
-                System.out.println("See you next Time");
+                System.out.println("See you next time!");
             }
-            default -> System.out.println("Invalid Input, Enter between (1-5)");
+            default -> System.out.println("Invalid choice. Enter a number from 1 to 6.");
         }
     }
 }
