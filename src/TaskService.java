@@ -6,7 +6,7 @@ public class TaskService {
 
     private static int ID = 1;
     private static List<Task> taskList;
-    TaskStorage taskStorage;
+    private final TaskStorage taskStorage;
 
     public TaskService(TaskStorage taskStorage) throws IOException {
         this.taskStorage = taskStorage;
@@ -21,44 +21,34 @@ public class TaskService {
         Task task = new Task(ID++, title);
         taskList.add(task);
         taskStorage.storeCurrentData(task);
-        System.out.println("Task Added!");
+        System.out.println("Task added!");
     }
 
     public ArrayList<Task> getAllTaskRecords() {
         return new ArrayList<>(taskList);
     }
 
-    public void markAsCompleteFor(int id) throws IOException {
-        if (changeTaskStatus(id, "complete")) {
-            System.out.println("Status has change");
-        } else {
-            System.out.println("Failed to change status");
-        }
-    }
-
-    public void changeStausFor(int id) throws IOException {
-        if (changeTaskStatus(id, "change")) {
-            System.out.println("Status has change");
-        } else {
-            System.out.println("Failed to change status");
-        }
-    }
-
-    private boolean changeTaskStatus(int id, String type) throws IOException {
+    public boolean markAsCompleteFor(int id) throws IOException {
         for (Task task : taskList) {
             if (task.getID() == id) {
-                var oldMark = task.isCompleted();
-                if (type.equalsIgnoreCase("complete"))
+                if (!task.isCompleted()) {
                     task.markCompleted();
-                else
-                    task.changeStatus();
-                if (oldMark != task.isCompleted()) {
                     taskStorage.updateAllRecords(taskList);
                 }
                 return true;
             }
         }
         return false;
+    }
+
+    public void changeStatusFor(int id) throws IOException {
+        for (Task task : taskList) {
+            if (task.getID() == id) {
+                task.changeStatus();
+                taskStorage.updateAllRecords(taskList);
+                return;
+            }
+        }
     }
 
     public List<Task> getTasksByStatus(boolean completed) {
@@ -69,8 +59,9 @@ public class TaskService {
 
     public boolean deleteTask(int id) throws IOException {
         boolean removed = taskList.removeIf(task -> task.getID() == id);
-        if (removed)
+        if (removed) {
             taskStorage.updateAllRecords(taskList);
+        }
         return removed;
     }
 }
