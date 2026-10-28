@@ -1,21 +1,55 @@
 # Task Manager CLI
 
-A lightweight command-line task management application built with Core Java. Create tasks, track completion, filter by status, and persist data locally without a database or external dependencies.
+A lightweight command-line task manager built with Core Java. Add tasks, mark them as completed, filter them by status, and save them locally between runs. No database or external libraries are required.
 
 ## Features
 
-- Add tasks with unique IDs
-- View all tasks
+- Add tasks with unique, increasing IDs
+- List all tasks
 - Mark tasks as completed
-- Delete tasks
-- Filter pending and completed tasks
-- Save and reload tasks automatically
-- Validate empty titles and invalid IDs
+- Filter completed and pending tasks
+- Delete tasks by ID
+- Automatically load and save task data
+- Validate empty input and report invalid task IDs
 
 ## Requirements
 
-- Java Development Kit (JDK) 17 or newer
-- Terminal or command prompt
+- JDK 17 or newer
+- A terminal or command prompt
+
+Check your Java version:
+
+```bash
+java -version
+javac -version
+```
+
+## Compile and Run
+
+Run these commands from the project root.
+
+Compile:
+
+```bash
+javac -d out src/*.java
+```
+
+Run:
+
+```bash
+java -cp out Main
+```
+
+On Windows, these commands also work in PowerShell when JDK 17+ is installed and available on `PATH`.
+
+## Data Storage
+
+The application creates a `data/` directory in the current working directory when it starts. It stores:
+
+- `data/Task_Records.txt` — task IDs, completion status, and titles
+- `data/Last_ID.txt` — the last assigned ID, so IDs are not reused after deleting tasks
+
+The `data/` directory is ignored by Git because it contains your local task data.
 
 ## Project Structure
 
@@ -26,44 +60,25 @@ TaskManager/
 │   ├── Task.java
 │   ├── TaskService.java
 │   └── TaskStorage.java
-├── data/                 # Created automatically
 ├── .gitignore
+├── LICENSE
 └── README.md
 ```
 
-## Run the Application
-
-Compile the source files:
-
-```bash
-javac -d out src/*.java
-```
-
-Start the application:
-
-```bash
-java -cp out Main
-```
-
-## Data Storage
-
-Tasks are saved locally in `data/tasks.txt`. The file is created automatically when a task is saved.
-
 ## Concepts Demonstrated
 
-- Object-oriented programming
-- Encapsulation and constructors
-- Collections and Stream API
-- File handling with Java NIO
+- Classes, objects, constructors, and encapsulation
+- Java collections and the Stream API
+- File handling with `java.io`
 - Exception handling and input validation
-- Basic data persistence
+- Separating application logic from storage logic
 
 ## Limitations
 
-- Console interface only
-- Local file storage; no database or cloud synchronization
-- No concurrent access support
+- Command-line interface only
+- Local plain-text storage; no database or cloud sync
+- Intended for one user/process at a time
 
 ## License
 
-This project is available under the MIT License. See [LICENSE](LICENSE) for details.
+Released under the MIT License. See [LICENSE](LICENSE).
