@@ -6,80 +6,103 @@ import java.util.List;
 import java.util.Scanner;
 
 public class TaskStorage {
-    private final String PATH_DIR;
-    private final String RECORD_FILE;
-    private final String LAST_ID;
+    private static final String PATH_DIR = "data";
+    private static final String RECORD_FILE = "Task_Records.txt";
+    private static final String LAST_ID = "Last_ID.txt";
 
-    public TaskStorage() {
-        PATH_DIR = "data";
-        new File(PATH_DIR).mkdir();
-        RECORD_FILE = "Task_Records.txt";
-        LAST_ID = "Last_ID.txt";
+    public TaskStorage() throws IOException {
+        File directory = new File(PATH_DIR);
+        if (!directory.exists() && !directory.mkdirs()) {
+            throw new IOException("Could not create data directory: " + directory.getAbsolutePath());
+        }
+        if (!directory.isDirectory()) {
+            throw new IOException("Data path is not a directory: " + directory.getAbsolutePath());
+        }
     }
 
-    private File tryToCreateFileIFNotExist(String fileName) throws IOException {
-        var file = new File(fileName);
-        file.createNewFile();
+    private File createFileIfMissing(String fileName) throws IOException {
+        File file = new File(fileName);
+        if (!file.exists() && !file.createNewFile()) {
+            throw new IOException("Could not create file: " + file.getPath());
+        }
         return file;
     }
 
     public List<Task> getPreviousRecords() throws IOException {
-        List<Task> taskList = new ArrayList<>();
-        var file = tryToCreateFileIFNotExist(PATH_DIR + "/" + RECORD_FILE);
-        try (Scanner fileScanner = new Scanner(file)) {
-            var id = 0;
-            var title = "";
-            var isComplete = false;
-            while (fileScanner.hasNextLine()) {
-                for (int i = 0; i < 3; i++) {
-                    switch (i) {
-                        case 0 -> id = Integer.parseInt(fileScanner.next());
-                        case 1 -> isComplete = fileScanner.nextBoolean();
-                        case 2 -> title = fileScanner.nextLine();
-                    }
+        List<Task> tasks = new ArrayList<>();
+        File file = createFileIfMissing(PATH_DIR + "/" + RECORD_FILE);
+
+        try (Scanner scanner = new Scanner(file)) {
+            int lineNumber = 0;
+            while (scanner.hasNextLine()) {
+                lineNumber++;
+                String line = scanner.nextLine();
+                if (line.isBlank()) {
+                    continue;
                 }
-                taskList.add(new Task(id, title, isComplete));
+
+                // Keep the remainder of the line as the title, including spaces between words.
+                String[] parts = line.split("\\s+", 3);
+                if (parts.length != 3
+                        || !parts[1].equalsIgnoreCase("true") && !parts[1].equalsIgnoreCase("false")) {
+                    throw new IOException("Invalid task record at line " + lineNumber + ".");
+                }
+
+                try {
+                    int id = Integer.parseInt(parts[0]);
+                    boolean completed = Boolean.parseBoolean(parts[1]);
+                    String title = parts[2];
+                    if (title.isBlank()) {
+                        throw new IOException("Task title is empty at line " + lineNumber + ".");
+                    }
+                    tasks.add(new Task(id, title, completed));
+                } catch (NumberFormatException e) {
+                    throw new IOException("Invalid task ID at line " + lineNumber + ".", e);
+                }
             }
         }
-        return taskList;
+        return tasks;
     }
 
     public int getLastId() throws IOException {
-        var id = 0;
-        var file = tryToCreateFileIFNotExist(PATH_DIR + "/" + LAST_ID);
-        try (Scanner fileScanner = new Scanner(file)) {
-            if (fileScanner.hasNextInt())
-                id = fileScanner.nextInt();
+        File file = createFileIfMissing(PATH_DIR + "/" + LAST_ID);
+        try (Scanner scanner = new Scanner(file)) {
+            if (scanner.hasNextInt()) {
+                return scanner.nextInt();
+            }
         }
-        return id;
+        return 0;
     }
 
     private void storeLastId(int id) throws IOException {
-        var oldId = getLastId();
-        try (FileWriter fileWriter = new FileWriter(PATH_DIR + "/" + LAST_ID)) {
-            id = (oldId < id) ? id : oldId;
-            fileWriter.write(String.valueOf(id));
+        int lastId = Math.max(getLastId(), id);
+        try (FileWriter writer = new FileWriter(PATH_DIR + "/" + LAST_ID, false)) {
+            writer.write(Integer.toString(lastId));
         }
     }
 
     public void storeCurrentData(Task task) throws IOException {
-        tryToCreateFileIFNotExist(PATH_DIR + "/" + RECORD_FILE);
-        try (FileWriter fileWriter = new FileWriter(PATH_DIR + "/" + RECORD_FILE, true)) {
-            var id = task.getID();
-            fileWriter.write(String.valueOf(id) + " " + task.isCompleted() + " " + task.getTitle() + "\n");
-            storeLastId(id);
+        File file = createFileIfMissing(PATH_DIR + "/" + RECORD_FILE);
+        try (FileWriter writer = new FileWriter(file, true)) {
+            writer.write(task.getID() + " " + task.isCompleted() + " " + task.getTitle() + System.lineSeparator());
         }
+        storeLastId(task.getID());
     }
 
     public void updateAllRecords(List<Task> records) throws IOException {
-        var lastID = getLastId();
-        var file = tryToCreateFileIFNotExist(PATH_DIR + "/" + RECORD_FILE);
-        try (FileWriter fileWriter = new FileWriter(file, false)) {
+        File file = createFileIfMissing(PATH_DIR + "/" + RECORD_FILE);
+        try (FileWriter writer = new FileWriter(file, false)) {
             for (Task task : records) {
-                lastID = (task.getID() > lastID) ? task.getID() : lastID;
-                fileWriter.write(task.getID() + " " + task.isCompleted() + " " + task.getTitle() + "\n");
+                writer.write(task.getID() + " " + task.isCompleted() + " " + task.getTitle()
+                        + System.lineSeparator());
             }
         }
-        storeLastId(lastID);
+
+        // Keep IDs increasing even after the highest-numbered task is deleted.
+        int highestId = getLastId();
+        for (Task task : records) {
+            highestId = Math.max(highestId, task.getID());
+        }
+        storeLastId(highestId);
     }
 }
