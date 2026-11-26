@@ -1,11 +1,9 @@
 package com.saheb.taskman;
 
 import com.saheb.TaskService;
-import com.saheb.TaskStorage;
 import com.saheb.TaskStorageDAO;
 import com.saheb.Task;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Scanner;
 
@@ -17,7 +15,8 @@ class Menu {
         System.out.println("3: Mark Task as Completed");
         System.out.println("4: Filter Tasks by Status");
         System.out.println("5: Delete Task by ID");
-        System.out.println("6: Exit");
+        System.out.println("6: Save Record In CSV");
+        System.out.println("7: Exit");
     }
 }
 
@@ -97,10 +96,15 @@ public class App {
                         ? "Task deleted."
                         : "No task found with ID " + id + ".");
             }
-            case "6" -> {
+
+            case "6" -> taskService.saveRecordsLocally();
+
+            case "7" -> {
                 isEnd = true;
+                taskService.saveRecordsLocally();
                 System.out.println("See you next time!");
             }
+
             default -> System.out.println("Invalid choice. Enter a number from 1 to 6.");
         }
     }

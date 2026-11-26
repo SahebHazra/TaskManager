@@ -1,6 +1,5 @@
 package com.saheb;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,7 +38,7 @@ public class TaskService {
             if (task.getID() == id) {
                 if (!task.isCompleted()) {
                     task.markCompleted();
-                    taskStorageDAO.updateStatusForID(id,task.isCompleted());
+                    taskStorageDAO.updateStatusForID(id, task.isCompleted());
                 }
                 return true;
             }
@@ -51,7 +50,7 @@ public class TaskService {
         for (Task task : taskList) {
             if (task.getID() == id) {
                 task.changeStatus();
-                taskStorageDAO.updateStatusForID(id,task.isCompleted());
+                taskStorageDAO.updateStatusForID(id, task.isCompleted());
                 return;
             }
         }
@@ -69,5 +68,11 @@ public class TaskService {
             taskStorageDAO.deleteRecordForID(id);
         }
         return removed;
+    }
+
+    public void saveRecordsLocally() throws Exception {
+        System.out.println("Saving CSV...");
+        if (LocalStorage.saveRecordsLocally(taskList))
+            System.out.println("Data is Saved on Local");
     }
 }

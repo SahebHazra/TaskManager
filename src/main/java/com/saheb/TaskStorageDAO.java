@@ -11,7 +11,7 @@ import java.util.List;
 
 public class TaskStorageDAO {
 
-    private static final String url = "jdbc:mysql://localhost:3306/taskDB";
+    private static final String url = "jdbc:mysql://localhost:3306/taskdb";
     private static final String user = "root";
     private static final String password = "saheb";
     private static Connection connection;
@@ -31,7 +31,8 @@ public class TaskStorageDAO {
             preparedStatement.setInt(1, task.getID());
             preparedStatement.setString(2, task.getTitle());
             preparedStatement.setBoolean(3, task.isCompleted());
-            preparedStatement.executeUpdate();
+            int count = preparedStatement.executeUpdate();
+            System.out.println("Add new : " + count + " record");
             connection.close();
         }
         return true;
