@@ -77,4 +77,21 @@ public class TaskStorageDAO {
         return taskList;
     }
 
+    public void updateStatusForID(int id, boolean isCompleted) throws Exception {
+        String sql = "UPDATE tasks SET STATUS=? WHERE ID=?";
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement(sql)) {
+            preparedStatement.setBoolean(1, isCompleted);
+            preparedStatement.setInt(2, id);
+            preparedStatement.executeQuery();
+        }
+    }
+
+    public void deleteRecordForID(int id) throws Exception{
+        String sql = "DELETE FROM tasks WHERE ID=?";
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement(sql)) {
+            preparedStatement.setInt(1, id);
+            preparedStatement.executeQuery();
+        }
+    }
+
 }

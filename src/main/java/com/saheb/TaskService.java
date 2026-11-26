@@ -12,7 +12,7 @@ public class TaskService {
 
     public TaskService(TaskStorageDAO taskStorageDAO) throws Exception {
         this.taskStorageDAO = taskStorageDAO;
-        taskList = new ArrayList<>();
+        taskList = new ArrayList<>(taskStorageDAO.getPreviousRecords());
         ID = taskStorageDAO.getLastRecordID() + 1;
     }
 
@@ -30,27 +30,16 @@ public class TaskService {
         }
     }
 
-    public ArrayList<Task> getAllTaskRecords() throws Exception {
-        ArrayList<Task> allTasks = getCurrentTaskRecords();
-        allTasks.addAll(getPreviousTaskRecords());
-        return allTasks;
-    }
-
-    public ArrayList<Task> getCurrentTaskRecords() {
+    public ArrayList<Task> getAllTaskRecords() {
         return new ArrayList<>(taskList);
     }
 
-    public ArrayList<Task> getPreviousTaskRecords() throws Exception {
-        return new ArrayList<>(taskStorageDAO.getPreviousRecords());
-    }
-
-    
-    public boolean markAsCompleteFor(int id) throws IOException {
+    public boolean markAsCompleteFor(int id) throws Exception {
         for (Task task : taskList) {
             if (task.getID() == id) {
                 if (!task.isCompleted()) {
                     task.markCompleted();
-                    taskStorage.updateAllRecords(taskList);
+                    taskStorageDAO.updateStatusForID(id,task.isCompleted());
                 }
                 return true;
             }
@@ -58,11 +47,11 @@ public class TaskService {
         return false;
     }
 
-    public void changeStatusFor(int id) throws IOException {
+    public void changeStatusFor(int id) throws Exception {
         for (Task task : taskList) {
             if (task.getID() == id) {
                 task.changeStatus();
-                taskStorage.updateAllRecords(taskList);
+                taskStorageDAO.updateStatusForID(id,task.isCompleted());
                 return;
             }
         }
@@ -74,10 +63,10 @@ public class TaskService {
                 .toList();
     }
 
-    public boolean deleteTask(int id) throws IOException {
+    public boolean deleteTask(int id) throws Exception {
         boolean removed = taskList.removeIf(task -> task.getID() == id);
         if (removed) {
-            taskStorage.updateAllRecords(taskList);
+            taskStorageDAO.deleteRecordForID(id);
         }
         return removed;
     }
