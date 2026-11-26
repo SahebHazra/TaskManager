@@ -1,8 +1,7 @@
 .vscode
 .mvn
-src/data/
-src/target/classes
-src/target/test-classes
+data/
+target/
 
 src/*.class
 project.md
