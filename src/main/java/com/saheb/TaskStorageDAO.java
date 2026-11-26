@@ -3,25 +3,20 @@ package com.saheb;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TaskStorageDAO {
 
     private static final String url = "jdbc:mysql://localhost:3306/taskDB";
     private static final String user = "root";
     private static final String password = "saheb";
-
     private static Connection connection;
 
-    public TaskStorageDAO() {
-
-    }
-
-    private static Connection getConnection() throws SQLException {
+    private static Connection getConnection() throws Exception {
         connection = DriverManager.getConnection(url, user, password);
         return connection;
     }
@@ -36,9 +31,8 @@ public class TaskStorageDAO {
             preparedStatement.setInt(1, task.getID());
             preparedStatement.setString(2, task.getTitle());
             preparedStatement.setBoolean(3, task.isCompleted());
+            preparedStatement.executeUpdate();
             connection.close();
-        } catch (SQLException e) {
-            throw new Exception(e.getMessage());
         }
         return true;
     }
@@ -63,10 +57,6 @@ public class TaskStorageDAO {
 
         try (PreparedStatement preparedStatement = getConnection().prepareStatement(sql)) {
             ResultSet resultSet = preparedStatement.executeQuery();
-            int id;
-            String title;
-            boolean isCompleted;
-
             while (resultSet.next()) {
                 Task task = new Task(resultSet.getInt(1), resultSet.getString(2), resultSet.getBoolean(3));
                 taskList.add(task);
@@ -82,15 +72,19 @@ public class TaskStorageDAO {
         try (PreparedStatement preparedStatement = getConnection().prepareStatement(sql)) {
             preparedStatement.setBoolean(1, isCompleted);
             preparedStatement.setInt(2, id);
-            preparedStatement.executeQuery();
+            int count = preparedStatement.executeUpdate();
+            System.out.println("Deleted Records : " + count);
+            connection.close();
         }
     }
 
-    public void deleteRecordForID(int id) throws Exception{
+    public void deleteRecordForID(int id) throws Exception {
         String sql = "DELETE FROM tasks WHERE ID=?";
         try (PreparedStatement preparedStatement = getConnection().prepareStatement(sql)) {
             preparedStatement.setInt(1, id);
-            preparedStatement.executeQuery();
+            int count = preparedStatement.executeUpdate();
+            System.out.println("Deleted Records : " + count);
+            connection.close();
         }
     }
 

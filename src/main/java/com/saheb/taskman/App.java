@@ -29,7 +29,7 @@ public class App {
         final TaskService taskService;
         try {
             taskService = new TaskService(new TaskStorageDAO());
-        } catch (IOException e) {
+        } catch (Exception e) {
             System.err.println("Could not initialise task storage: " + e.getMessage());
             return;
         }
@@ -39,10 +39,10 @@ public class App {
                 Menu.taskMenu();
                 runMenu(taskService);
                 System.out.println();
-            } catch (IOException e) {
-                System.err.println("Could not save task data: " + e.getMessage());
             } catch (IllegalArgumentException e) {
                 System.err.println("Invalid input: " + e.getMessage());
+            } catch (Exception e) {
+                System.err.println("Could not save task data: " + e.getMessage());
             }
         }
     }
@@ -64,7 +64,7 @@ public class App {
         records.forEach(System.out::println);
     }
 
-    private static void runMenu(TaskService taskService) throws IOException {
+    private static void runMenu(TaskService taskService) throws Exception {
         String option = takeInput("\nChoose: ").trim();
         switch (option) {
             case "1" -> {
