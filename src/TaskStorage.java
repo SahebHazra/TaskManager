@@ -30,10 +30,9 @@ public class TaskStorage {
 
     public List<Task> getPreviousRecords() throws IOException {
         List<Task> tasks = new ArrayList<>();
-        File file = createFileIfMissing(PATH_DIR + "/" + RECORD_FILE);
         boolean needToRewriteTheRecord = false;
 
-        try (Scanner scanner = new Scanner(file)) {
+        try (Scanner scanner = new Scanner(createFileIfMissing(PATH_DIR + "/" + RECORD_FILE))) {
             int lineNumber = 0;
             while (scanner.hasNextLine()) {
                 lineNumber++;
