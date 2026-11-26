@@ -1,83 +1,125 @@
 # Task Manager CLI
 
-A lightweight command-line task manager built with Core Java. Add tasks, mark them as completed, filter them by status, and save them locally between runs. No database or external libraries are required.
+A console-based task management application built with **Core Java 17** and **Maven**. It lets you create tasks, view and filter them, update their completion status, and delete them. The `master` branch stores data locally in text files, so no database is required.
 
 ## Features
 
-- Add tasks with unique, increasing IDs
-- List all tasks
-- Mark tasks as completed
-- Filter completed and pending tasks
-- Delete tasks by ID
-- Automatically load and save task data
-- Validate empty input and report invalid task IDs
+- Add tasks with automatically assigned, increasing IDs
+- View all saved tasks
+- Mark a task as completed
+- Change a task's status
+- Filter tasks by status (pending or completed)
+- Delete a task by ID
+- Load task records when the application starts
+- Persist changes locally between runs
+- Validate empty task titles and handle invalid task IDs
 
 ## Requirements
 
 - JDK 17 or newer
+- Apache Maven 3.8+ (or a compatible recent Maven release)
 - A terminal or command prompt
 
-Check your Java version:
+Check that Java and Maven are available:
 
 ```bash
 java -version
-javac -version
+mvn -version
 ```
 
-## Compile and Run
+## Run the application
 
-Run these commands from the project root.
-
-Compile:
+Clone the repository and move into the project directory:
 
 ```bash
-javac -d out src/*.java
+git clone https://github.com/SahebHazra/TaskManager.git
+cd TaskManager
 ```
 
-Run:
+Build and run with Maven:
 
 ```bash
-java -cp out Main
+mvn clean compile
+mvn exec:java -Dexec.mainClass="com.saheb.taskman.App"
 ```
 
-On Windows, these commands also work in PowerShell when JDK 17+ is installed and available on `PATH`.
+You can also package the project:
 
-## Data Storage
+```bash
+mvn clean package
+```
 
-The application creates a `data/` directory in the current working directory when it starts. It stores:
+The application is a terminal-based program; run the commands from the project root.
 
-- `data/Task_Records.txt` — task IDs, completion status, and titles
-- `data/Last_ID.txt` — the last assigned ID, so IDs are not reused after deleting tasks
+## Menu
 
-The `data/` directory is ignored by Git because it contains your local task data.
+The application provides options to:
 
-## Project Structure
+1. Add a task
+2. Show all tasks
+3. Mark a task as completed
+4. Filter tasks by status
+5. Delete a task by ID
+6. Exit
+
+The exact prompts are shown when the application starts.
+
+## Data storage
+
+On first run, the application creates a `data/` directory in the working directory. The master branch uses two local files:
+
+| File | Purpose |
+| --- | --- |
+| `data/Task_Records.txt` | Stores task IDs, status, and titles |
+| `data/Last_ID.txt` | Stores the last assigned ID to avoid reusing IDs after tasks are deleted |
+
+These files are generated locally and are excluded from Git. Back up the `data/` directory if you want to keep your task records.
+
+## Project structure
+
+The source code follows a Maven layout:
 
 ```text
 TaskManager/
 ├── src/
-│   ├── Main.java
-│   ├── Task.java
-│   ├── TaskService.java
-│   └── TaskStorage.java
-├── .gitignore
-├── LICENSE
+│   ├── main/
+│   │   └── java/
+│   │       └── com/saheb/taskman/
+│   │           ├── App.java
+│   │           ├── model/
+│   │           │   └── Task.java
+│   │           ├── service/
+│   │           │   └── TaskService.java
+│   │           └── storage/
+│   │               └── TaskStorage.java
+│   └── test/
+│       └── java/
+├── data/                 # Created at runtime; ignored by Git
+├── pom.xml
 └── README.md
 ```
 
-## Concepts Demonstrated
+## Concepts demonstrated
 
-- Classes, objects, constructors, and encapsulation
-- Java collections and the Stream API
-- File handling with `java.io`
+- Object-oriented programming: classes, objects, encapsulation
+- Collections and the Java Stream API
+- File handling and persistence
 - Exception handling and input validation
-- Separating application logic from storage logic
+- Separation of application, service, model, and storage responsibilities
+- Building and running a Java project with Maven
 
-## Limitations
+## Branches
 
-- Command-line interface only
-- Local plain-text storage; no database or cloud sync
-- Intended for one user/process at a time
+- **master** — the file-based version; uses local text files and does not require MySQL.
+- **feature/sql** — the JDBC/MySQL development branch.
+
+For the SQL branch, follow its branch-specific database setup and configuration before running it. The instructions above describe `master`.
+
+## Current scope
+
+- Command-line interface; no web interface
+- Local, single-user file storage
+- No cloud synchronization or multi-user access
 
 ## License
 
