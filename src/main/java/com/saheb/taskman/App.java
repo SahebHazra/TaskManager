@@ -2,6 +2,7 @@ package com.saheb.taskman;
 
 import com.saheb.TaskService;
 import com.saheb.TaskStorage;
+import com.saheb.TaskStorageDAO;
 import com.saheb.Task;
 
 import java.io.IOException;
@@ -27,7 +28,7 @@ public class App {
     public static void main(String[] args) {
         final TaskService taskService;
         try {
-            taskService = new TaskService(new TaskStorage());
+            taskService = new TaskService(new TaskStorageDAO());
         } catch (IOException e) {
             System.err.println("Could not initialise task storage: " + e.getMessage());
             return;
