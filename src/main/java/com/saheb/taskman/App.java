@@ -1,3 +1,9 @@
+package com.saheb.taskman;
+
+import com.saheb.TaskService;
+import com.saheb.TaskStorage;
+import com.saheb.Task;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Scanner;
@@ -14,7 +20,7 @@ class Menu {
     }
 }
 
-public class Main {
+public class App {
     private static final Scanner sc = new Scanner(System.in);
     private static boolean isEnd = false;
 

@@ -1,4 +1,9 @@
-data/
+.vscode
+.mvn
+src/data/
+src/target/classes
+src/target/test-classes
+
 src/*.class
 project.md
 *.class
