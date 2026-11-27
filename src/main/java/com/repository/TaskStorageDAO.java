@@ -70,9 +70,14 @@ public class TaskStorageDAO {
         try (Connection connection = getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(sql);
                 ResultSet resultSet = preparedStatement.executeQuery()) {
-            while (resultSet.next()) {
-                Task task = new Task(resultSet.getInt(1), resultSet.getString(2), resultSet.getBoolean(3));
-                taskList.add(task);
+
+            for (int line = 0; resultSet.next(); line++) {
+                try {
+                    Task task = new Task(resultSet.getInt(1), resultSet.getString(2), resultSet.getBoolean(3));
+                    taskList.add(task);
+                } catch (IllegalArgumentException e) {
+                    System.out.println("Invalid Record on Line: " + line + ", " + e);
+                }
             }
         }
         return taskList;

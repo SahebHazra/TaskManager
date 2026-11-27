@@ -27,7 +27,7 @@ public class LocalStorage {
         return file;
     }
 
-    public static boolean saveRecordsLocally(List<Task> records) throws Exception {
+    public static boolean saveRecordsLocally(List<Task> records) throws IOException {
         File file = createFileIfMissing(PATH_DIR + "/" + RECORD_FILE);
         try (FileWriter writer = new FileWriter(file, false)) {
             writer.write("ID, Task Title, Status " + System.lineSeparator());
@@ -37,8 +37,6 @@ public class LocalStorage {
                 String title = task.getTitle().replace("\"", "\"\"");
                 writer.write(task.getID() + ", \"" + title + "\", " + status + System.lineSeparator());
             }
-        } catch (IOException e) {
-            throw new Exception("Failed to Save Data Locally", e);
         }
         return true;
     }

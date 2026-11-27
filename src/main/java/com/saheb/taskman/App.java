@@ -4,6 +4,8 @@ import com.model.Task;
 import com.repository.TaskStorageDAO;
 import com.service.TaskService;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Scanner;
 
@@ -28,8 +30,8 @@ public class App {
         final TaskService taskService;
         try {
             taskService = new TaskService(new TaskStorageDAO());
-        } catch (Exception e) {
-            System.err.println("Failed to initialise task storage: " + e.getMessage());
+        } catch (SQLException e) {
+            System.err.println("Error on Data Initilization : " + e.getMessage());
             return;
         }
 
@@ -40,8 +42,13 @@ public class App {
                 System.out.println();
             } catch (IllegalArgumentException e) {
                 System.err.println("Invalid input: " + e.getMessage());
+            } catch (SQLException e) {
+                System.err.println("Error with data handling : " + e.getMessage());
+            } catch (IOException e) {
+                System.err.println("Fail to save data locally: " + e.getMessage());
             } catch (Exception e) {
-                System.err.println("Could not save task data: " + e.getMessage());
+                System.err.println("Unknown Error : " + e);
+                e.printStackTrace();
             }
         }
     }
@@ -63,7 +70,7 @@ public class App {
         records.forEach(System.out::println);
     }
 
-    private static void runMenu(TaskService taskService) throws Exception {
+    private static void runMenu(TaskService taskService) throws IOException, SQLException {
         String option = takeInput("\nChoose: ").trim();
         switch (option) {
             case "1" -> {

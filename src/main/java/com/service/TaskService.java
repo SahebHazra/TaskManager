@@ -1,5 +1,7 @@
 package com.service;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,16 +14,16 @@ public class TaskService {
     private final List<Task> taskList;
     private final TaskStorageDAO taskStorageDAO;
 
-    public TaskService(TaskStorageDAO taskStorageDAO) throws Exception {
+    public TaskService(TaskStorageDAO taskStorageDAO) throws SQLException {
         this.taskStorageDAO = taskStorageDAO;
         taskList = new ArrayList<>(taskStorageDAO.getPreviousRecords());
     }
 
-    public void addTask(String title) throws Exception {
+    public void addTask(String title) throws SQLException {
         if (title == null || title.isBlank()) {
             throw new IllegalArgumentException("Task title cannot be empty.");
         }
-        int id = taskStorageDAO.addData(title);
+        final int id = taskStorageDAO.addData(title);
         if (id > 0) {
             Task task = new Task(id, title);
             taskList.add(task);
@@ -34,7 +36,7 @@ public class TaskService {
         return new ArrayList<>(taskList);
     }
 
-    public boolean changeStatusFor(int id, boolean markAsComplete) throws Exception {
+    public boolean changeStatusFor(int id, boolean markAsComplete) throws SQLException {
         for (Task task : taskList) {
             if (task.getID() == id) {
                 boolean status = markAsComplete || !task.isCompleted();
@@ -51,7 +53,7 @@ public class TaskService {
 
     }
 
-    public boolean changeStatusFor(int id) throws Exception {
+    public boolean changeStatusFor(int id) throws SQLException {
         return changeStatusFor(id, false);
     }
 
@@ -61,7 +63,7 @@ public class TaskService {
                 .toList();
     }
 
-    public boolean deleteTask(int id) throws Exception {
+    public boolean deleteTask(int id) throws SQLException {
         if (taskStorageDAO.deleteRecordForID(id)) {
             for (Task task : taskList) {
                 if (task.getID() == id)
@@ -71,7 +73,7 @@ public class TaskService {
         return false;
     }
 
-    public void saveRecordsLocally() throws Exception {
+    public void saveRecordsLocally() throws IOException {
         System.out.println("Saving CSV...");
         if (LocalStorage.saveRecordsLocally(taskList))
             System.out.println("Data is Saved on Local");
