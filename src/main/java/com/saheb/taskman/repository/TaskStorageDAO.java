@@ -1,9 +1,8 @@
-package com.repository;
+package com.saheb.taskman.repository;
+
+import com.saheb.taskman.model.Task;
 
 import io.github.cdimascio.dotenv.Dotenv;
-
-import com.model.Task;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;

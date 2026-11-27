@@ -1,11 +1,11 @@
-package com.storage;
+package com.saheb.taskman.storage;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
-import com.model.Task;
+import com.saheb.taskman.model.Task;
 
 public class LocalStorage {
     private static final String PATH_DIR = "data";

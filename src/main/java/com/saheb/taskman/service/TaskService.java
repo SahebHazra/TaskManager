@@ -1,13 +1,13 @@
-package com.service;
+package com.saheb.taskman.service;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.model.Task;
-import com.repository.TaskStorageDAO;
-import com.storage.LocalStorage;
+import com.saheb.taskman.model.Task;
+import com.saheb.taskman.repository.TaskStorageDAO;
+import com.saheb.taskman.storage.LocalStorage;
 
 public class TaskService {
 

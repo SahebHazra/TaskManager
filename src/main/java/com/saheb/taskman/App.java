@@ -1,8 +1,8 @@
 package com.saheb.taskman;
 
-import com.model.Task;
-import com.repository.TaskStorageDAO;
-import com.service.TaskService;
+import com.saheb.taskman.model.Task;
+import com.saheb.taskman.repository.TaskStorageDAO;
+import com.saheb.taskman.service.TaskService;
 
 import java.io.IOException;
 import java.sql.SQLException;
