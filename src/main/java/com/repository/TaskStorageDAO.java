@@ -30,48 +30,39 @@ public class TaskStorageDAO {
     }
 
     public TaskStorageDAO() {
-        try {
-            DriverManager.registerDriver(new com.mysql.cj.jdbc.Driver());
-        } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage());
-        }
+        // try {
+        // DriverManager.registerDriver(new com.mysql.cj.jdbc.Driver());
+        // } catch (SQLException e) {
+        // throw new RuntimeException(e.getMessage());
+        // }
     }
 
-    private static Connection getConnection() throws Exception {
+    private static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
     }
 
-    public boolean addData(Task task) throws Exception {
+    public int addData(String title) throws SQLException {
         String sql = """
-                INSERT INTO tasks(id,title,status)
-                VALUES(?,?,?);
+                INSERT INTO tasks(title)
+                VALUES(?);
                 """;
 
         try (Connection connection = getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setInt(1, task.getID());
-            preparedStatement.setString(2, task.getTitle());
-            preparedStatement.setBoolean(3, task.isCompleted());
+                PreparedStatement preparedStatement = connection.prepareStatement(sql,
+                        Statement.RETURN_GENERATED_KEYS)) {
+
+            preparedStatement.setString(1, title);
             int count = preparedStatement.executeUpdate();
             System.out.println("Add new : " + count + " record");
-            return count > 0;
+            try (ResultSet rset = preparedStatement.getGeneratedKeys()) {
+                if (rset.next())
+                    return rset.getInt(1);
+            }
         }
+        return -1;
     }
 
-    public int getLastRecordID() throws Exception {
-        String sql = "SELECT MAX(ID) FROM tasks";
-        int id = 0;
-        try (Connection connection = getConnection();
-                Statement statement = connection.createStatement();
-                ResultSet resultSet = statement.executeQuery(sql);) {
-            if (resultSet.next())
-                id = resultSet.getInt(1);
-            resultSet.close();
-        }
-        return id;
-    }
-
-    public List<Task> getPreviousRecords() throws Exception {
+    public List<Task> getPreviousRecords() throws SQLException {
 
         final List<Task> taskList = new ArrayList<>();
         String sql = "SELECT * FROM tasks";
@@ -87,7 +78,7 @@ public class TaskStorageDAO {
         return taskList;
     }
 
-    public boolean updateStatusForID(int id, boolean isCompleted) throws Exception {
+    public boolean updateStatusForID(int id, boolean isCompleted) throws SQLException {
         String sql = "UPDATE tasks SET STATUS=? WHERE ID=?";
         try (Connection connection = getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -99,7 +90,7 @@ public class TaskStorageDAO {
         }
     }
 
-    public boolean deleteRecordForID(int id) throws Exception {
+    public boolean deleteRecordForID(int id) throws SQLException {
         String sql = "DELETE FROM tasks WHERE ID=?";
         try (Connection connection = getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(sql)) {

@@ -9,25 +9,22 @@ import com.storage.LocalStorage;
 
 public class TaskService {
 
-    private int nextId = 1;
     private final List<Task> taskList;
     private final TaskStorageDAO taskStorageDAO;
 
     public TaskService(TaskStorageDAO taskStorageDAO) throws Exception {
         this.taskStorageDAO = taskStorageDAO;
         taskList = new ArrayList<>(taskStorageDAO.getPreviousRecords());
-        nextId = taskStorageDAO.getLastRecordID() + 1;
     }
 
     public void addTask(String title) throws Exception {
         if (title == null || title.isBlank()) {
             throw new IllegalArgumentException("Task title cannot be empty.");
         }
-
-        Task task = new Task(nextId, title);
-        if (taskStorageDAO.addData(task)) {
+        int id = taskStorageDAO.addData(title);
+        if (id > 0) {
+            Task task = new Task(id, title);
             taskList.add(task);
-            nextId++;
             System.out.println("Task added!");
         } else
             System.out.println("Failed to Add");
@@ -40,12 +37,14 @@ public class TaskService {
     public boolean changeStatusFor(int id, boolean markAsComplete) throws Exception {
         for (Task task : taskList) {
             if (task.getID() == id) {
-                if (markAsComplete && taskStorageDAO.updateStatusForID(id, markAsComplete))
-                    task.markCompleted();
-                else if (taskStorageDAO.updateStatusForID(id, !task.isCompleted()))
-                    task.changeStatus();
-
-                return true;
+                boolean status = markAsComplete || !task.isCompleted();
+                if (taskStorageDAO.updateStatusForID(id, status)) {
+                    if (markAsComplete) // status
+                        task.markCompleted();
+                    else
+                        task.changeStatus();
+                    return true;
+                }
             }
         }
         return false;
