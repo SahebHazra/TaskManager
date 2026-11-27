@@ -12,7 +12,7 @@ class Menu {
         System.out.println("===== Task Manager =====");
         System.out.println("1: Add Task");
         System.out.println("2: Show All Tasks");
-        System.out.println("3: Mark Task as Completed");
+        System.out.println("3: Change Task Status");
         System.out.println("4: Filter Tasks by Status");
         System.out.println("5: Delete Task by ID");
         System.out.println("6: Save Record In CSV");
@@ -29,7 +29,7 @@ public class App {
         try {
             taskService = new TaskService(new TaskStorageDAO());
         } catch (Exception e) {
-            System.err.println("Could not initialise task storage: " + e.getMessage());
+            System.err.println("Failed to initialise task storage: " + e.getMessage());
             return;
         }
 
@@ -76,9 +76,9 @@ public class App {
             case "2" -> printList(taskService.getAllTaskRecords());
             case "3" -> {
                 int id = Integer.parseInt(takeInput("Enter task ID: ").trim());
-                System.out.println(taskService.markAsCompleteFor(id)
-                        ? "Task marked as completed."
-                        : "No task found with ID " + id + ".");
+                System.out.println(taskService.changeStatusFor(id)
+                        ? "Task Status has been changed."
+                        : "Fail to change status for ID: " + id + ".");
             }
             case "4" -> {
                 System.out.println("1: Completed Tasks");

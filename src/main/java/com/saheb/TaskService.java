@@ -19,41 +19,35 @@ public class TaskService {
         if (title == null || title.isBlank()) {
             throw new IllegalArgumentException("Task title cannot be empty.");
         }
+        
         Task task = new Task(nextId++, title);
-        taskList.add(task);
-        if (taskStorageDAO.addData(task))
+        if (taskStorageDAO.addData(task)) {
+            taskList.add(task);
             System.out.println("Task added!");
-        else {
-            taskList.remove(task);
+        } else
             System.out.println("Failed to Add");
-        }
     }
 
     public ArrayList<Task> getAllTaskRecords() {
         return new ArrayList<>(taskList);
     }
 
-    public boolean markAsCompleteFor(int id) throws Exception {
+    public boolean changeStatusFor(int id, boolean markAsComplete) throws Exception {
         for (Task task : taskList) {
             if (task.getID() == id) {
-                if (!task.isCompleted()) {
+                if (markAsComplete)
                     task.markCompleted();
-                    taskStorageDAO.updateStatusForID(id, task.isCompleted());
-                }
+                else
+                    task.changeStatus();
+                taskStorageDAO.updateStatusForID(id, task.isCompleted());
                 return true;
             }
         }
         return false;
     }
 
-    public void changeStatusFor(int id) throws Exception {
-        for (Task task : taskList) {
-            if (task.getID() == id) {
-                task.changeStatus();
-                taskStorageDAO.updateStatusForID(id, task.isCompleted());
-                return;
-            }
-        }
+    public boolean changeStatusFor(int id) throws Exception {
+        return changeStatusFor(id, false);
     }
 
     public List<Task> getTasksByStatus(boolean completed) {
@@ -63,11 +57,13 @@ public class TaskService {
     }
 
     public boolean deleteTask(int id) throws Exception {
-        boolean removed = taskList.removeIf(task -> task.getID() == id);
-        if (removed) {
-            taskStorageDAO.deleteRecordForID(id);
+        if (taskStorageDAO.deleteRecordForID(id) > 0) {
+            for (Task task : taskList) {
+                if (task.getID() == id)
+                    return taskList.remove(task);
+            }
         }
-        return removed;
+        return false;
     }
 
     public void saveRecordsLocally() throws Exception {

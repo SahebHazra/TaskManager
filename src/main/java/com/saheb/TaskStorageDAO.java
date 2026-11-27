@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.Statement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,8 +17,8 @@ public class TaskStorageDAO {
 
     public TaskStorageDAO() {
         try {
-            Class.forName("com.mysql.cj.mysql.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
+            DriverManager.registerDriver(new com.mysql.cj.jdbc.Driver());
+        } catch (SQLException e) {
             throw new RuntimeException(e.getMessage());
         }
     }
@@ -28,7 +29,7 @@ public class TaskStorageDAO {
 
     public boolean addData(Task task) throws Exception {
         String sql = """
-                INSERT INTO tasks(ID,TITLE,STATUS)
+                INSERT INTO tasks(id,title,status)
                 VALUES(?,?,?);
                 """;
 
@@ -83,13 +84,14 @@ public class TaskStorageDAO {
         }
     }
 
-    public void deleteRecordForID(int id) throws Exception {
+    public int deleteRecordForID(int id) throws Exception {
         String sql = "DELETE FROM tasks WHERE ID=?";
         try (Connection connection = getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, id);
             int count = preparedStatement.executeUpdate();
             System.out.println("Deleted Records : " + count);
+            return count;
         }
     }
 
