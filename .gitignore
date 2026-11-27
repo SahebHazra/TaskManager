@@ -4,7 +4,7 @@ data/
 target/
 src/*.class
 
-*/*/*/*/*/env
+src/main/java/com/env/*
 
 project.md
 *.class
