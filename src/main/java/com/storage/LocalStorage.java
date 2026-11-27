@@ -34,7 +34,8 @@ public class LocalStorage {
             String status;
             for (Task task : records) {
                 status = (task.isCompleted()) ? "Completed" : "Pending";
-                writer.write(task.getID() + ", \"" + task.getTitle() + "\", " + status + System.lineSeparator());
+                String title = task.getTitle().replace("\"", "\"\"");
+                writer.write(task.getID() + ", \"" + title + "\", " + status + System.lineSeparator());
             }
         } catch (IOException e) {
             throw new Exception("Failed to Save Data Locally", e);
