@@ -1,8 +1,8 @@
 package com.saheb.taskman;
 
-import com.saheb.model.Task;
-import com.saheb.repository.TaskStorageDAO;
-import com.saheb.service.TaskService;
+import com.model.Task;
+import com.repository.TaskStorageDAO;
+import com.service.TaskService;
 
 import java.util.List;
 import java.util.Scanner;

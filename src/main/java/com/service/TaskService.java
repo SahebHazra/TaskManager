@@ -1,11 +1,11 @@
-package com.saheb.service;
+package com.service;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.saheb.model.Task;
-import com.saheb.repository.TaskStorageDAO;
-import com.saheb.storage.LocalStorage;
+import com.model.Task;
+import com.repository.TaskStorageDAO;
+import com.storage.LocalStorage;
 
 public class TaskService {
 

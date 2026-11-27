@@ -1,11 +1,11 @@
-package com.saheb.storage;
+package com.storage;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
-import com.saheb.model.Task;
+import com.model.Task;
 
 public class LocalStorage {
     private static final String PATH_DIR = "data";

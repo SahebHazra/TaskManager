@@ -1,7 +1,7 @@
-package com.saheb.repository;
+package com.repository;
 
-import com.saheb.env.Env;
-import com.saheb.model.Task;
+import com.env.Env;
+import com.model.Task;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -16,8 +16,15 @@ import java.util.List;
 public class TaskStorageDAO {
 
     private static final String DB_URL = Env.getDB_URL();
-    private static final String DB_USER =  Env.getDB_USER();
-    private static final String DB_PASSWORD =  Env.getDB_KEY();
+    private static final String DB_USER = Env.getDB_USER();
+    private static final String DB_PASSWORD = Env.getDB_KEY();
+
+    static {
+        if (DB_URL == null || DB_USER == null || DB_PASSWORD == null) {
+            throw new IllegalStateException(
+                    "Missing database configuration in .env");
+        }
+    }
 
     public TaskStorageDAO() {
         try {
