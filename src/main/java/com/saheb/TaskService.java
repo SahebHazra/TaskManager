@@ -5,21 +5,21 @@ import java.util.List;
 
 public class TaskService {
 
-    private static int ID = 1;
-    private static List<Task> taskList;
+    private int nextId = 1;
+    private final List<Task> taskList;
     private final TaskStorageDAO taskStorageDAO;
 
     public TaskService(TaskStorageDAO taskStorageDAO) throws Exception {
         this.taskStorageDAO = taskStorageDAO;
         taskList = new ArrayList<>(taskStorageDAO.getPreviousRecords());
-        ID = taskStorageDAO.getLastRecordID() + 1;
+        nextId = taskStorageDAO.getLastRecordID() + 1;
     }
 
     public void addTask(String title) throws Exception {
         if (title == null || title.isBlank()) {
             throw new IllegalArgumentException("Task title cannot be empty.");
         }
-        Task task = new Task(ID++, title);
+        Task task = new Task(nextId++, title);
         taskList.add(task);
         if (taskStorageDAO.addData(task))
             System.out.println("Task added!");

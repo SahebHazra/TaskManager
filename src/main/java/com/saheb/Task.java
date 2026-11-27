@@ -1,12 +1,13 @@
 package com.saheb;
+
 public class Task {
-    private final int ID;
-    private final String title;
+    private int id;
+    private String title;
     private boolean isCompleted;
 
     public Task(int id, String title) {
-        this.ID = id;
-        this.title = title;
+        setId(id);
+        setTitle(title);
         isCompleted = false;
     }
 
@@ -15,8 +16,21 @@ public class Task {
         this.isCompleted = isCompleted;
     }
 
+    private void setId(int id) {
+        if (id < 1)
+            throw new IllegalArgumentException("Task id can't negative");
+        this.id = id;
+    }
+
+    private void setTitle(String title) {
+        if (title == null || title.isBlank())
+            throw new IllegalArgumentException("Task title cannot be empty.");
+        this.title = title;
+    }
+
+
     public int getID() {
-        return ID;
+        return id;
     }
 
     public String getTitle() {
@@ -32,13 +46,13 @@ public class Task {
     }
 
     public void changeStatus() {
-        this.isCompleted = (isCompleted) ? false : true;
+        this.isCompleted = (this.isCompleted) ? false : true;
     }
 
     @Override
     public String toString() {
         String status = (isCompleted) ? "DONE" : "PENDING";
-        return "[ " + ID + " ] " + title + " - " + status;
+        return "[ " + id + " ] " + title + " - " + status;
     }
 
 }
