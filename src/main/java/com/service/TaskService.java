@@ -61,7 +61,7 @@ public class TaskService {
     }
 
     public boolean deleteTask(int id) throws Exception {
-        if (taskStorageDAO.deleteRecordForID(id) > 0) {
+        if (taskStorageDAO.deleteRecordForID(id)) {
             for (Task task : taskList) {
                 if (task.getID() == id)
                     return taskList.remove(task);

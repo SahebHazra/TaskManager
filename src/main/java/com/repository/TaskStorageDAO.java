@@ -54,8 +54,8 @@ public class TaskStorageDAO {
             preparedStatement.setBoolean(3, task.isCompleted());
             int count = preparedStatement.executeUpdate();
             System.out.println("Add new : " + count + " record");
+            return count > 0;
         }
-        return true;
     }
 
     public int getLastRecordID() throws Exception {
@@ -94,18 +94,18 @@ public class TaskStorageDAO {
             preparedStatement.setBoolean(1, isCompleted);
             preparedStatement.setInt(2, id);
             int count = preparedStatement.executeUpdate();
-            System.out.println("Deleted Records : " + count);
+            System.out.println("Updated Records : " + count);
         }
     }
 
-    public int deleteRecordForID(int id) throws Exception {
+    public boolean deleteRecordForID(int id) throws Exception {
         String sql = "DELETE FROM tasks WHERE ID=?";
         try (Connection connection = getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, id);
             int count = preparedStatement.executeUpdate();
             System.out.println("Deleted Records : " + count);
-            return count;
+            return count > 0;
         }
     }
 
