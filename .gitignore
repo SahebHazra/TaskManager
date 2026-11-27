@@ -1,10 +1,10 @@
+.env
 .vscode
 .mvn
+
 data/
 target/
 src/*.class
-
-src/main/java/com/env
 
 project.md
 *.class

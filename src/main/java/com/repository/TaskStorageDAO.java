@@ -1,6 +1,7 @@
 package com.repository;
 
-import com.env.Env;
+import io.github.cdimascio.dotenv.Dotenv;
+
 import com.model.Task;
 
 import java.sql.Connection;
@@ -15,9 +16,11 @@ import java.util.List;
 
 public class TaskStorageDAO {
 
-    private static final String DB_URL = Env.getDB_URL();
-    private static final String DB_USER = Env.getDB_USER();
-    private static final String DB_PASSWORD = Env.getDB_KEY();
+    private static final Dotenv dotenv = Dotenv.load();
+
+    private static final String DB_URL = dotenv.get("DB_URL");
+    private static final String DB_USER = dotenv.get("DB_USER");
+    private static final String DB_PASSWORD = dotenv.get("DB_PASSWORD");
 
     static {
         if (DB_URL == null || DB_USER == null || DB_PASSWORD == null) {
