@@ -7,6 +7,7 @@ import com.saheb.taskman.service.TaskService;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 class Menu {
@@ -46,6 +47,9 @@ public class App {
                 System.err.println("Error with data handling : " + e.getMessage());
             } catch (IOException e) {
                 System.err.println("Fail to save data locally: " + e.getMessage());
+            } catch (NoSuchElementException e) {
+                System.err.println("Program Tarminated Forcefully : " + e.getMessage());
+                return;
             } catch (Exception e) {
                 System.err.println("Unknown Error : " + e);
                 e.printStackTrace();
