@@ -37,7 +37,7 @@ public class LocalStorage {
                 writer.write(task.getID() + ", \"" + task.getTitle() + "\", " + status + System.lineSeparator());
             }
         } catch (IOException e) {
-            throw new Exception("Failed to Save Data Locally");
+            throw new Exception("Failed to Save Data Locally", e);
         }
         return true;
     }

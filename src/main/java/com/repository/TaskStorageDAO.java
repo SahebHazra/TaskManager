@@ -62,8 +62,8 @@ public class TaskStorageDAO {
         String sql = "SELECT MAX(ID) FROM tasks";
         int id = 0;
         try (Connection connection = getConnection();
-                Statement statement = connection.createStatement()) {
-            ResultSet resultSet = statement.executeQuery(sql);
+                Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery(sql);) {
             if (resultSet.next())
                 id = resultSet.getInt(1);
             resultSet.close();
@@ -87,7 +87,7 @@ public class TaskStorageDAO {
         return taskList;
     }
 
-    public void updateStatusForID(int id, boolean isCompleted) throws Exception {
+    public boolean updateStatusForID(int id, boolean isCompleted) throws Exception {
         String sql = "UPDATE tasks SET STATUS=? WHERE ID=?";
         try (Connection connection = getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -95,6 +95,7 @@ public class TaskStorageDAO {
             preparedStatement.setInt(2, id);
             int count = preparedStatement.executeUpdate();
             System.out.println("Updated Records : " + count);
+            return count > 0;
         }
     }
 

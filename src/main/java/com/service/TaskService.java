@@ -23,10 +23,11 @@ public class TaskService {
         if (title == null || title.isBlank()) {
             throw new IllegalArgumentException("Task title cannot be empty.");
         }
-        
-        Task task = new Task(nextId++, title);
+
+        Task task = new Task(nextId, title);
         if (taskStorageDAO.addData(task)) {
             taskList.add(task);
+            nextId++;
             System.out.println("Task added!");
         } else
             System.out.println("Failed to Add");
@@ -39,15 +40,16 @@ public class TaskService {
     public boolean changeStatusFor(int id, boolean markAsComplete) throws Exception {
         for (Task task : taskList) {
             if (task.getID() == id) {
-                if (markAsComplete)
+                if (markAsComplete && taskStorageDAO.updateStatusForID(id, markAsComplete))
                     task.markCompleted();
-                else
+                else if (taskStorageDAO.updateStatusForID(id, !task.isCompleted()))
                     task.changeStatus();
-                taskStorageDAO.updateStatusForID(id, task.isCompleted());
+
                 return true;
             }
         }
         return false;
+
     }
 
     public boolean changeStatusFor(int id) throws Exception {

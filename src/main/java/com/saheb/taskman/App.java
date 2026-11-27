@@ -105,7 +105,7 @@ public class App {
                 System.out.println("See you next time!");
             }
 
-            default -> System.out.println("Invalid choice. Enter a number from 1 to 6.");
+            default -> System.out.println("Invalid choice. Enter a number from 1 to 7.");
         }
     }
 }
