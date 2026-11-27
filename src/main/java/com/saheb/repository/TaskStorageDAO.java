@@ -1,4 +1,7 @@
-package com.saheb;
+package com.saheb.repository;
+
+import com.saheb.env.Env;
+import com.saheb.model.Task;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -11,9 +14,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TaskStorageDAO {
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/taskdb";
-    private static final String DB_USER = "root";
-    private static final String DB_PASSWORD = "saheb";
+
+    private static final String DB_URL = Env.getDB_URL();
+    private static final String DB_USER =  Env.getDB_USER();
+    private static final String DB_PASSWORD =  Env.getDB_KEY();
 
     public TaskStorageDAO() {
         try {

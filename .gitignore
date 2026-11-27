@@ -2,8 +2,10 @@
 .mvn
 data/
 target/
-
 src/*.class
+
+*/*/*/*/*/env
+
 project.md
 *.class
 draft

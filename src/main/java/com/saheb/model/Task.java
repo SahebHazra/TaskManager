@@ -1,4 +1,4 @@
-package com.saheb;
+package com.saheb.model;
 
 public class Task {
     private int id;
